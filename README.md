@@ -1,16 +1,15 @@
-# Veylola Android APK
+# Veylola Android
 
-This project packages the Veylola Base44 web application as an Android WebView app.
-
-Start URL:
+Android WebView application for:
 https://veylola-connect-plus.base44.app
 
-## GitHub build
+## Build with GitHub Actions
 
-1. Upload the project to a GitHub repository.
-2. Open Actions.
-3. Select **Build Veylola Android APK**.
-4. Choose **Run workflow**.
-5. After the build completes, download the **Veylola-APK** artifact.
+1. Create a GitHub repository.
+2. Upload all files from this project.
+3. Push to the `main` branch.
+4. Open GitHub → Actions → Build Veylola Android APK.
+5. Open the completed workflow run.
+6. Download the `Veylola-Android-APK` artifact.
 
-This is a WebView wrapper around the online Base44 application. It requires internet access for the web application.
+This is a WebView/hybrid Android app. The Veylola interface and backend remain hosted by Base44.
