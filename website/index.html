@@ -1,1 +1,35 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>i mobile — Virtual Numbers</title><link rel="stylesheet" href="style.css"></head><body><header><b>i mobile</b><nav><a href="#features">Features</a><a href="#how">How it works</a><button id="open">Get started</button></nav></header><main><section class="hero"><div><p class="tag">NIGERIA • +234</p><h1>Your virtual number.<br>One simple app.</h1><p class="lead">Get and manage a provider-issued Nigerian virtual number, receive messages, and keep your communications in one secure dashboard.</p><button id="hero">Create account</button></div><div class="card"><span>YOUR NUMBER</span><strong>+234 ••• ••• ••••</strong><small>SMS inbox • Number management • Secure account</small></div></section><section id="features"><h2>Everything in one place</h2><div class="grid"><article><b>+234 numbers</b><p>Request a real provider-issued Nigerian virtual number.</p></article><article><b>SMS inbox</b><p>View inbound messages linked to your assigned number.</p></article><article><b>Secure account</b><p>Account interface ready for a future secure backend.</p></article></div></section><section id="how"><h2>How it works</h2><p>1. Create your account. 2. Sign in. 3. Request a number. 4. Manage your number and messages.</p></section></main><div id="modal" class="modal hidden"><div class="dialog"><button id="close">×</button><h2>Create account</h2><input id="email" placeholder="Email"><input id="password" type="password" placeholder="Password"><button id="submit">Create account</button><p id="msg"></p></div></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>i mobile — Virtual Numbers</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="landing">
+<header><b>i mobile</b><nav><a href="#features">Features</a><a href="#how">How it works</a><button id="open">Get started</button></nav></header>
+<main>
+<section class="hero"><div><p class="tag">NIGERIA • +234</p><h1>Your virtual number.<br>One simple app.</h1><p class="lead">Get and manage a provider-issued Nigerian virtual number, receive messages, and keep your communications in one secure dashboard.</p><button id="hero">Create account</button></div><div class="card"><span>YOUR NUMBER</span><strong>+234 ••• ••• ••••</strong><small>SMS inbox • Number management • Secure account</small></div></section>
+<section id="features"><h2>Everything in one place</h2><div class="grid"><article><b>+234 numbers</b><p>Request a real provider-issued Nigerian virtual number.</p></article><article><b>SMS inbox</b><p>View inbound messages linked to your assigned number.</p></article><article><b>Secure account</b><p>Your private dashboard keeps account features in one place.</p></article></div></section>
+<section id="how"><h2>How it works</h2><p>1. Create your account. 2. Sign in. 3. Request a number. 4. Manage your number and messages.</p></section>
+</main>
+</div>
+<div id="dashboard" class="hidden">
+<header class="dash-head"><div><b>i mobile</b><small id="userEmail"></small></div><button id="logout">Sign out</button></header>
+<main class="dashboard-main">
+<div class="welcome"><p class="tag">YOUR ACCOUNT</p><h1>Welcome back.</h1><p>Manage your virtual number, wallet and SMS inbox from one dashboard.</p></div>
+<div class="dash-grid">
+<article class="balance"><span>WALLET BALANCE</span><strong>₦0.00</strong><button>Fund wallet</button></article>
+<article><span>MY VIRTUAL NUMBER</span><strong class="masked">+234 ••• ••• ••••</strong><p> No number assigned yet.</p><button>Get a +234 number</button></article>
+<article><span>SMS INBOX</span><strong>0 messages</strong><p>Your incoming messages will appear here.</p><button>Open inbox</button></article>
+<article><span>TRANSACTIONS</span><strong>₦0.00</strong><p>No transactions yet.</p><button>View transactions</button></article>
+</div>
+<section class="quick"><h2>Quick actions</h2><div class="grid"><article><b>Get a number</b><p>Request your Nigerian virtual number.</p><button>Continue</button></article><article><b>SMS inbox</b><p>Check messages received on your number.</p><button>Open inbox</button></article><article><b>Profile</b><p>Manage your account information and settings.</p><button>Open profile</button></article></div></section>
+</main>
+</div>
+<div id="modal" class="modal hidden"><div class="dialog"><button id="close">×</button><h2>Create account</h2><input id="email" autocomplete="email" placeholder="Email"><input id="password" autocomplete="current-password" type="password" placeholder="Password"><button id="submit">Create account</button><p id="msg"></p></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js?v=dashboard1"></script>
+</body>
+</html>
