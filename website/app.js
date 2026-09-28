@@ -4,6 +4,7 @@ const SUPABASE_PUBLISHABLE_KEY="sb_publishable_HIMGxb-O6fj9O7OzT4ukuQ_jm5W8mWz";
 document.addEventListener("DOMContentLoaded",async()=>{
   const $=id=>document.getElementById(id);
   const modal=$("modal"),msg=$("msg"),title=document.querySelector(".dialog h2"),submit=$("submit");
+
   const showModal=()=>{modal.classList.remove("hidden");msg.textContent="";$("email").focus()};
   $("open").onclick=showModal;$("hero").onclick=showModal;$("close").onclick=()=>modal.classList.add("hidden");
 
@@ -17,8 +18,14 @@ document.addEventListener("DOMContentLoaded",async()=>{
   if(!window.supabase){msg.textContent="Account service could not load. Please refresh.";return}
   const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
 
+  const actionMessage=(heading,body)=>{
+    alert(heading+"\n\n"+body);
+  };
+
   const showDashboard=session=>{
-    if(!session){$("dashboard").classList.add("hidden");$("landing").classList.remove("hidden");return}
+    if(!session){
+      $("dashboard").classList.add("hidden");$("landing").classList.remove("hidden");return;
+    }
     $("userEmail").textContent=session.user?.email||"Signed-in account";
     $("landing").classList.add("hidden");$("dashboard").classList.remove("hidden");modal.classList.add("hidden");
   };
@@ -48,4 +55,23 @@ document.addEventListener("DOMContentLoaded",async()=>{
   };
 
   $("logout").onclick=async()=>{await supabase.auth.signOut();showDashboard(null)};
+
+  // Enable every dashboard action with useful feedback.
+  const buttons=[...document.querySelectorAll("#dashboard button")].filter(b=>b.id!=="logout");
+  buttons.forEach(button=>{
+    button.addEventListener("click",()=>{
+      const label=button.textContent.trim();
+      if(label==="Fund wallet"){
+        actionMessage("Fund wallet","Wallet funding is ready for payment integration. Your current balance is ₦0.00.");
+      }else if(label==="Get a +234 number"||label==="Continue"){
+        actionMessage("Get a +234 number","Number request is ready. A provider-issued number will be assigned when the number service is connected and funded.");
+      }else if(label==="Open inbox"){
+        actionMessage("SMS inbox","Your inbox is active. New messages will appear here when a virtual number is assigned.");
+      }else if(label==="View transactions"){
+        actionMessage("Transactions","Your transaction history will appear here after your first wallet or number transaction.");
+      }else if(label==="Open profile"){
+        actionMessage("Profile","Profile settings are ready for account details and preferences.");
+      }
+    });
+  });
 });
