@@ -9,14 +9,15 @@ const PORT=Number(process.env.PORT||10000);
 const SUPABASE_URL=process.env.SUPABASE_URL||"https://vihbsfrwnslnmheowkhy.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY=process.env.SUPABASE_PUBLISHABLE_KEY||"";
 const EVESES_API_BASE="https://api.eveses.com/api/v1";
+const EVESES_LEGACY_RENTAL_BASE="https://api.eveses.com/v1";
 
 app.get("/api/health",(_req,res)=>res.json({ok:true,providerConfigured:Boolean(process.env.EVESES_API_KEY)}));
 
-async function evesesFetch(path,options={}){
+async function evesesFetch(path,options={},base=EVESES_API_BASE){
   const key=process.env.EVESES_API_KEY;
   if(!key)throw Object.assign(new Error("Eveses is not configured on Render. Add EVESES_API_KEY."),{status:503});
   const headers={Authorization:"Bearer "+key,"Content-Type":"application/json",...(options.headers||{})};
-  const response=await fetch(EVESES_API_BASE+path,{...options,headers});
+  const response=await fetch(base+path,{...options,headers});
   const text=await response.text();
   let payload={}; try{payload=text?JSON.parse(text):{}}catch{payload={raw:text};}
   if(!response.ok)throw Object.assign(new Error("Eveses API request failed."),{status:response.status,payload});
@@ -50,10 +51,22 @@ app.post("/api/provision-number",async(req,res)=>{
     const existing=await admin.from("imobile_numbers").select("phone_number,provider_number_id").eq("user_id",user.id).eq("status","active").eq("provider","eveses").limit(1).maybeSingle();
     if(existing.data?.phone_number)return res.json({phone_number:existing.data.phone_number,provider_number_id:existing.data.provider_number_id,status:"active",message:"Your existing virtual number is ready."});
 
-    const order=await evesesFetch("/numbers/orders",{
-      method:"POST",
-      body:JSON.stringify({service:"any-rental",country:"ng"})
-    });
+    let order;
+    try{
+      order=await evesesFetch("/numbers/orders",{
+        method:"POST",
+        body:JSON.stringify({service:"any-rental",country:"ng"})
+      },EVESES_LEGACY_RENTAL_BASE);
+    }catch(firstError){
+      if(firstError.status===404||firstError.status===422||firstError.status===502){
+        order=await evesesFetch("/numbers/orders",{
+          method:"POST",
+          body:JSON.stringify({country:"ng",mode:"rent",service:"any-rental"})
+        });
+      }else{
+        throw firstError;
+      }
+    }
     const number=order?.number||order?.data?.number;
     const orderId=order?.id||order?.uuid||order?.data?.id;
     if(!number||!orderId)return res.status(502).json({error:"Eveses returned an incomplete rental response.",details:order});
@@ -90,7 +103,16 @@ app.get("/api/inbox",async(req,res)=>{
     const existing=await admin.from("imobile_numbers").select("provider_number_id").eq("user_id",user.id).eq("status","active").eq("provider","eveses").limit(1).maybeSingle();
     if(!existing.data?.provider_number_id)return res.json({messages:[]});
     const orderId=encodeURIComponent(existing.data.provider_number_id);
-    const payload=await evesesFetch("/numbers/orders/"+orderId+"/sms");
+    let payload;
+    try{
+      payload=await evesesFetch("/numbers/orders/"+orderId+"/sms",{},EVESES_LEGACY_RENTAL_BASE);
+    }catch(firstError){
+      if(firstError.status===404||firstError.status===502){
+        payload=await evesesFetch("/numbers/orders/"+orderId+"/sms");
+      }else{
+        throw firstError;
+      }
+    }
     res.json({messages:Array.isArray(payload)?payload:(payload?.messages||payload?.data||[])});
   }catch(e){
     res.status(e.status||500).json({error:e.message||"Unexpected error",details:e.payload||null});
