@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: exampilot-ai
+    runtime: docker
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
