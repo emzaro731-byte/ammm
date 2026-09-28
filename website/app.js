@@ -66,7 +66,11 @@ document.addEventListener("DOMContentLoaded",async()=>{
       if(!accessToken)throw new Error("Please sign in again.");
       const response=await fetch("/api/provision-number",{method:"POST",headers:{Authorization:"Bearer "+accessToken,"Content-Type":"application/json"}});
       const data=await response.json();
-      const error=response.ok?null:new Error(data?.error||"Number service failed.");
+      let error=null;
+      if(!response.ok){
+        const detail=typeof data?.details==="string"?data.details:(data?.details?.message||data?.details?.error||"");
+        error=new Error((data?.error||"Number service failed.")+(detail?" — "+detail:"")+` (HTTP ${response.status})`);
+      }
       if(error)throw error;
       if(data?.error)throw new Error(data.error);
       const number=data?.phone_number;
