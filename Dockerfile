@@ -1,11 +1,9 @@
-FROM nginx:1.27-alpine
-
-COPY website/ /usr/share/nginx/html/
-COPY nginx.conf.template /etc/nginx/templates/default.conf.template
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-
-RUN chmod +x /docker-entrypoint.sh
-
+FROM node:22-alpine
+WORKDIR /app
+COPY package.json ./
+RUN npm install --omit=dev
+COPY server.js ./
+COPY website/ ./website/
+ENV NODE_ENV=production
 EXPOSE 10000
-
-ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["node","server.js"]
