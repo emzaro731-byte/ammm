@@ -35,6 +35,8 @@ app.get("/api/wallet",async(req,res)=>{
   }
 });
 
+app.get("/api/wallet",async(req,res)=>{try{if(!process.env.EVESES_API_KEY)return res.status(503).json({error:"Eveses is not configured on Render."});const payload=await evesesFetch("/me");const balance=payload?.wallet?.balance??payload?.balance??payload?.data?.wallet?.balance??payload?.data?.balance??0;res.json({balance,currency:payload?.wallet?.currency||payload?.currency||"USD"});}catch(e){res.status(e.status||500).json({error:e.message||"Could not load wallet.",details:e.payload||null});}});
+
 app.get("/api/number-options",async(req,res)=>{
   try{
     const payload=await evesesFetch("/numbers/summary?country=ng");
