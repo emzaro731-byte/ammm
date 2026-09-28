@@ -1,35 +1,13 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>i mobile — Virtual Numbers</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div id="landing">
-<header><b>i mobile</b><nav><a href="#features">Features</a><a href="#how">How it works</a><button id="open">Get started</button></nav></header>
-<main>
-<section class="hero"><div><p class="tag">NIGERIA • +234</p><h1>Your virtual number.<br>One simple app.</h1><p class="lead">Get and manage a provider-issued Nigerian virtual number, receive messages, and keep your communications in one secure dashboard.</p><button id="hero">Create account</button></div><div class="card"><span>YOUR NUMBER</span><strong>+234 ••• ••• ••••</strong><small>SMS inbox • Number management • Secure account</small></div></section>
-<section id="features"><h2>Everything in one place</h2><div class="grid"><article><b>+234 numbers</b><p>Request a real provider-issued Nigerian virtual number.</p></article><article><b>SMS inbox</b><p>View inbound messages linked to your assigned number.</p></article><article><b>Secure account</b><p>Your private dashboard keeps account features in one place.</p></article></div></section>
-<section id="how"><h2>How it works</h2><p>1. Create your account. 2. Sign in. 3. Request a number. 4. Manage your number and messages.</p></section>
-</main>
-</div>
-<div id="dashboard" class="hidden">
-<header class="dash-head"><div><b>i mobile</b><small id="userEmail"></small></div><button id="logout">Sign out</button></header>
-<main class="dashboard-main">
-<div class="welcome"><p class="tag">YOUR ACCOUNT</p><h1>Welcome back.</h1><p>Manage your virtual number, wallet and SMS inbox from one dashboard.</p></div>
-<div class="dash-grid">
-<article class="balance"><span>WALLET BALANCE</span><strong>₦0.00</strong><button>Fund wallet</button></article>
-<article><span>MY VIRTUAL NUMBER</span><strong class="masked">+234 ••• ••• ••••</strong><p> No number assigned yet.</p><button>Get a +234 number</button></article>
-<article><span>SMS INBOX</span><strong>0 messages</strong><p>Your incoming messages will appear here.</p><button>Open inbox</button></article>
-<article><span>TRANSACTIONS</span><strong>₦0.00</strong><p>No transactions yet.</p><button>View transactions</button></article>
-</div>
-<section class="quick"><h2>Quick actions</h2><div class="grid"><article><b>Get a number</b><p>Request your Nigerian virtual number.</p><button>Continue</button></article><article><b>SMS inbox</b><p>Check messages received on your number.</p><button>Open inbox</button></article><article><b>Profile</b><p>Manage your account information and settings.</p><button>Open profile</button></article></div></section>
-</main>
-</div>
-<div id="modal" class="modal hidden"><div class="dialog"><button id="close">×</button><h2>Create account</h2><input id="email" autocomplete="email" placeholder="Email"><input id="password" autocomplete="current-password" type="password" placeholder="Password"><button id="submit">Create account</button><p id="msg"></p></div></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?v=render-backend-20260928"></script>
-</body>
-</html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><meta name="theme-color" content="#f7f7f9"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="i mobile"><title>i mobile</title><link rel="stylesheet" href="style.css"></head><body>
+<div id="landing"><header class="topbar glass"><div class="brand"><span class="brand-dot"></span><b>i mobile</b></div><nav><a href="#features">Features</a><a href="#how">How it works</a><button id="open" class="glass-button">Get started</button></nav></header><main>
+<section class="hero"><div class="hero-copy"><p class="eyebrow">NIGERIA · +234</p><h1>Your number.<br><span>Beautifully simple.</span></h1><p class="lead">A full-screen mobile experience for your virtual number, messages and account — inspired by the calm, fluid feel of iPhone.</p><button id="hero" class="primary">Create account <span>›</span></button></div><div class="phone-preview glass"><div class="preview-notch"></div><div class="preview-content"><small>MY NUMBER</small><strong>+234 80•• ••• •••</strong><div class="preview-pill">SMS · Active</div></div></div></section>
+<section id="features" class="content-section"><p class="eyebrow">FEATURES</p><h2>Everything feels<br>right at home.</h2><div class="feature-grid"><article class="surface"><span class="icon">＋</span><b>+234 numbers</b><p>Request a provider-issued Nigerian virtual number from your account.</p></article><article class="surface"><span class="icon">✉</span><b>SMS inbox</b><p>Keep incoming messages together in a clean, focused inbox.</p></article><article class="surface"><span class="icon">◉</span><b>Private account</b><p>Your sign-in and number management stay in one place.</p></article></div></section>
+<section id="how" class="content-section how"><p class="eyebrow">HOW IT WORKS</p><h2>Three simple steps.</h2><div class="steps"><div><b>01</b><span>Create</span><p>Make your account.</p></div><div><b>02</b><span>Connect</span><p>Request your +234 number.</p></div><div><b>03</b><span>Use</span><p>Manage messages and your number.</p></div></div></section></main></div>
+<div id="dashboard" class="hidden app-shell"><header class="app-top glass"><div><p class="eyebrow">i mobile</p><h2>Home</h2></div><button id="profileTop" class="round-button glass-button" aria-label="Profile">●</button></header><main class="app-content">
+<section class="account-head"><p class="eyebrow">YOUR ACCOUNT</p><h1>Good to see you.</h1><p id="userEmail"></p></section>
+<section class="hero-card glass"><div class="card-label">WALLET BALANCE</div><strong>₦0.00</strong><button data-action="fund" class="glass-button">Fund wallet</button></section>
+<section class="number-card glass"><div class="card-row"><div><p class="card-label">MY VIRTUAL NUMBER</p><strong class="masked">+234 ••• ••• ••••</strong></div><span class="status-dot"></span></div><p id="numberStatus">No number assigned yet.</p><button data-action="number" class="primary full">Get a +234 number</button></section>
+<section class="list-card glass"><button class="list-row" data-action="inbox"><span class="list-icon">✉</span><span><b>SMS Inbox</b><small>Incoming messages</small></span><strong>›</strong></button><button class="list-row" data-action="transactions"><span class="list-icon">₦</span><span><b>Transactions</b><small>Payment history</small></span><strong>›</strong></button><button class="list-row" data-action="profile"><span class="list-icon">●</span><span><b>Profile & Settings</b><small>Account preferences</small></span><strong>›</strong></button></section></main>
+<nav class="tabbar glass"><button class="tab active" data-tab="home"><span>⌂</span><small>Home</small></button><button class="tab" data-tab="inbox"><span>✉</span><small>Inbox</small></button><button class="tab" data-tab="wallet"><span>₦</span><small>Wallet</small></button><button class="tab" data-tab="profile"><span>●</span><small>Profile</small></button></nav></div>
+<div id="modal" class="modal hidden"><div class="dialog sheet glass"><button id="close" class="close-button">×</button><div class="sheet-handle"></div><p class="eyebrow">WELCOME</p><h2>Create account</h2><p class="sheet-copy">Sign in or create your i mobile account.</p><input id="email" autocomplete="email" inputmode="email" placeholder="Email"><input id="password" autocomplete="current-password" type="password" placeholder="Password"><button id="submit" class="primary full">Create account</button><p id="msg"></p></div></div><div id="toast" class="toast glass hidden"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js?v=ios-liquid-glass-20260928"></script></body></html>
