@@ -1,19 +1,11 @@
 # i mobile
 
-Virtual-number app and website for provider-issued Nigerian +234 numbers.
+i mobile is a virtual-number application and website.
 
-## Architecture
-- Android/Kotlin client
-- Static website
-- Supabase Auth + Postgres + RLS
-- Supabase Edge Functions
-- Voicebip integration for telephony
+## Current mode
+The Supabase cloud backend has been removed from the application and website for now. No Supabase URL, key, Auth client, PostgREST calls, or Edge Function calls are used by the client.
 
-## Security
-Provider API credentials stay in Supabase Edge Function secrets, never in the APK or website. Supabase documents production Edge Function secrets for this pattern.
+The virtual-number UI remains ready for a future legitimate telephony-provider integration.
 
-Required Supabase secrets before live number provisioning:
-- VOICEBIP_API_KEY
-- VOICEBIP_AGENT_ID
-
-Use provider sandbox credentials first. A real number is issued by the telecom/virtual-number provider; i mobile does not manufacture phone numbers.
+## Next backend
+A provider API can later be connected through a secure server-side backend so provider credentials are not exposed in the APK or website.
