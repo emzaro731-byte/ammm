@@ -24,6 +24,17 @@ async function evesesFetch(path,options={},base=EVESES_API_BASE){
   return payload;
 }
 
+app.get("/api/wallet",async(req,res)=>{
+  try{
+    if(!process.env.EVESES_API_KEY)return res.status(503).json({error:"Eveses is not configured on Render."});
+    const payload=await evesesFetch("/me");
+    const balance=payload?.wallet?.balance??payload?.balance??payload?.data?.wallet?.balance??payload?.data?.balance??0;
+    res.json({balance,currency:payload?.wallet?.currency||payload?.currency||"USD",raw:payload});
+  }catch(e){
+    res.status(e.status||500).json({error:e.message||"Could not load wallet.",details:e.payload||null});
+  }
+});
+
 app.get("/api/number-options",async(req,res)=>{
   try{
     const payload=await evesesFetch("/numbers/summary?country=ng");
@@ -51,22 +62,10 @@ app.post("/api/provision-number",async(req,res)=>{
     const existing=await admin.from("imobile_numbers").select("phone_number,provider_number_id").eq("user_id",user.id).eq("status","active").eq("provider","eveses").limit(1).maybeSingle();
     if(existing.data?.phone_number)return res.json({phone_number:existing.data.phone_number,provider_number_id:existing.data.provider_number_id,status:"active",message:"Your existing virtual number is ready."});
 
-    let order;
-    try{
-      order=await evesesFetch("/numbers/orders",{
-        method:"POST",
-        body:JSON.stringify({service:"any-rental",country:"ng"})
-      },EVESES_LEGACY_RENTAL_BASE);
-    }catch(firstError){
-      if(firstError.status===404||firstError.status===422||firstError.status===502){
-        order=await evesesFetch("/numbers/orders",{
-          method:"POST",
-          body:JSON.stringify({country:"ng",mode:"rent",service:"any-rental"})
-        });
-      }else{
-        throw firstError;
-      }
-    }
+    const order=await evesesFetch("/numbers/orders",{
+      method:"POST",
+      body:JSON.stringify({country:"ng",mode:"rent",service:"any",duration_minutes:1440})
+    });
     const number=order?.number||order?.data?.number;
     const orderId=order?.id||order?.uuid||order?.data?.id;
     if(!number||!orderId)return res.status(502).json({error:"Eveses returned an incomplete rental response.",details:order});
