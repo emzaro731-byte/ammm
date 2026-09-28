@@ -52,7 +52,7 @@ app.post("/api/provision-number",async(req,res)=>{
 
     const order=await evesesFetch("/numbers/orders",{
       method:"POST",
-      body:JSON.stringify({service:"any",country:"ng",mode:"rent"})
+      body:JSON.stringify({service:"any-rental",country:"ng"})
     });
     const number=order?.number||order?.data?.number;
     const orderId=order?.id||order?.uuid||order?.data?.id;
