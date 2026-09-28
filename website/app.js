@@ -56,22 +56,37 @@ document.addEventListener("DOMContentLoaded",async()=>{
 
   $("logout").onclick=async()=>{await supabase.auth.signOut();showDashboard(null)};
 
-  // Enable every dashboard action with useful feedback.
+  const provisionNumber=async()=>{
+    const btn=[...document.querySelectorAll("#dashboard button")].find(b=>b.textContent.includes("Get a +234 number")||b.textContent.trim()==="Continue");
+    if(btn)btn.disabled=true;
+    actionMessage("Number request","Requesting your +234 virtual number…");
+    try{
+      const {data,error}=await supabase.functions.invoke("provision-number");
+      if(error)throw error;
+      if(data?.error)throw new Error(data.error);
+      const number=data?.phone_number;
+      if(!number)throw new Error("No number was returned by the provider.");
+      document.querySelectorAll(".masked").forEach(el=>el.textContent=number);
+      document.querySelectorAll(".dash-grid article").forEach(card=>{
+        if(card.textContent.includes("MY VIRTUAL NUMBER")){
+          const p=card.querySelector("p");if(p)p.textContent="Active • SMS enabled";
+        }
+      });
+      actionMessage("Number ready",number+"\\n\\nYour provider-issued virtual number is now active.");
+    }catch(error){
+      actionMessage("Number request failed",error?.message||"The number service could not complete the request.");
+    }finally{if(btn)btn.disabled=false}
+  };
+
   const buttons=[...document.querySelectorAll("#dashboard button")].filter(b=>b.id!=="logout");
   buttons.forEach(button=>{
-    button.addEventListener("click",()=>{
+    button.addEventListener("click",async()=>{
       const label=button.textContent.trim();
-      if(label==="Fund wallet"){
-        actionMessage("Fund wallet","Wallet funding is ready for payment integration. Your current balance is ₦0.00.");
-      }else if(label==="Get a +234 number"||label==="Continue"){
-        actionMessage("Get a +234 number","Number request is ready. A provider-issued number will be assigned when the number service is connected and funded.");
-      }else if(label==="Open inbox"){
-        actionMessage("SMS inbox","Your inbox is active. New messages will appear here when a virtual number is assigned.");
-      }else if(label==="View transactions"){
-        actionMessage("Transactions","Your transaction history will appear here after your first wallet or number transaction.");
-      }else if(label==="Open profile"){
-        actionMessage("Profile","Profile settings are ready for account details and preferences.");
-      }
+      if(label==="Fund wallet") actionMessage("Fund wallet","Wallet funding is not connected yet. Your current balance is ₦0.00.");
+      else if(label==="Get a +234 number"||label==="Continue") await provisionNumber();
+      else if(label==="Open inbox") actionMessage("SMS inbox","Your inbox will show incoming SMS for your active virtual number.");
+      else if(label==="View transactions") actionMessage("Transactions","Your transaction history will appear here.");
+      else if(label==="Open profile") actionMessage("Profile","Profile settings will appear here.");
     });
   });
 });
