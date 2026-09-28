@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>i mobile — Mobile made simple</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><a class="logo" href="#">i mobile</a><nav><a href="#services">Services</a><a href="#dashboard">Dashboard</a><button id="navSignIn">Sign in</button></nav></header>
+<main>
+<section class="hero"><div><span class="pill">YOUR MOBILE, YOUR WAY</span><h1>Simple mobile.<br><span>Built for you.</span></h1><p>Manage your i mobile account, SIM services, airtime and data from one secure place.</p><div class="actions"><button class="primary" id="heroSignUp">Create account</button><a class="secondary" href="#services">Explore services</a></div></section>
+<section id="services" class="section"><h2>Everything in one place</h2><div class="grid">
+<article><b>📱 SIM services</b><p>Check your SIM status and manage your mobile account.</p></article>
+<article><b>⚡ Airtime</b><p>Prepare airtime purchases for your i mobile account.</p></article>
+<article><b>🌐 Data</b><p>Manage data bundles from your dashboard.</p></article>
+<article><b>🛡️ KYC</b><p>Track your verification status securely.</p></article>
+</div></section>
+<section id="dashboard" class="dashboard"><div><span class="pill">ACCOUNT</span><h2 id="welcome">Your i mobile dashboard</h2><p id="status">Sign in to view your account.</p></div><button class="primary" id="dashboardButton">Sign in</button></section>
+</main>
+<div class="modal hidden" id="modal"><div class="card"><button class="close" id="close">×</button><h2 id="modalTitle">Create account</h2><form id="authForm"><input id="name" placeholder="Full name"><input id="phone" placeholder="Phone number"><input id="email" type="email" placeholder="Email"><input id="password" type="password" placeholder="Password (6+ characters)" minlength="6" required><button class="primary" id="submit" type="submit">Create account</button></form><p id="authMessage"></p><button class="switch" id="switch">Already have an account? Sign in</button></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js"></script>
+</body></html>
