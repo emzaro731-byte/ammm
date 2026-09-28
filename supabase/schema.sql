@@ -1,0 +1,10 @@
+create table if not exists public.exams(id uuid primary key default gen_random_uuid(),name text unique not null,description text,is_active boolean default true,created_at timestamptz default now());
+create table if not exists public.subjects(id uuid primary key default gen_random_uuid(),exam_id uuid references public.exams(id) on delete cascade,name text not null,unique(exam_id,name));
+create table if not exists public.questions(id uuid primary key default gen_random_uuid(),exam_id uuid references public.exams(id) on delete cascade,subject_id uuid references public.subjects(id) on delete cascade,question text not null,options jsonb not null,correct_option int not null,explanation text,is_active boolean default true);
+create table if not exists public.attempts(id uuid primary key default gen_random_uuid(),user_id uuid references auth.users(id) on delete cascade,exam_id uuid,subject_id uuid,total_questions int,correct_answers int,duration_seconds int default 0,created_at timestamptz default now());
+alter table public.exams enable row level security; alter table public.subjects enable row level security; alter table public.questions enable row level security; alter table public.attempts enable row level security;
+create policy "read active exams" on public.exams for select to authenticated using(is_active=true);
+create policy "read subjects" on public.subjects for select to authenticated using(true);
+create policy "read questions" on public.questions for select to authenticated using(is_active=true);
+create policy "own attempts" on public.attempts for all to authenticated using(auth.uid()=user_id) with check(auth.uid()=user_id);
+insert into public.exams(name,description) values('JAMB / UTME','CBT practice'),('WAEC','Practice'),('NECO','Practice') on conflict(name) do nothing;
