@@ -13,6 +13,17 @@ const VOICEBIP_AGENT_ID=process.env.VOICEBIP_AGENT_ID;
 
 app.get("/api/health",(_req,res)=>res.json({ok:true,providerConfigured:Boolean(VOICEBIP_API_KEY&&VOICEBIP_AGENT_ID)}));
 
+app.get("/api/number-options",async(req,res)=>{
+  try{
+    const apiKey=process.env.FLEEXA_API_KEY;
+    if(!apiKey)return res.status(503).json({error:"Fleexa is not configured on Render. Add FLEEXA_API_KEY."});
+    const response=await fetch("https://fleexa.com.ng/developer/rent/sms4/areas",{headers:{Authorization:"Bearer "+apiKey,"Content-Type":"application/json"}});
+    const payload=await response.json();
+    if(!response.ok)return res.status(response.status).json({error:"Fleexa availability request failed.",details:payload});
+    res.json({success:true,areas:payload?.data??payload});
+  }catch(e){res.status(500).json({error:e instanceof Error?e.message:"Unexpected error"});}
+});
+
 app.post("/api/provision-number",async(req,res)=>{
   try{
     const auth=req.headers.authorization||"";
@@ -28,13 +39,7 @@ app.post("/api/provision-number",async(req,res)=>{
     const admin=createClient(SUPABASE_URL,secret);
     const existing=await admin.from("imobile_numbers").select("phone_number,provider_number_id").eq("user_id",user.id).eq("status","active").eq("provider","fleexa").limit(1).maybeSingle();
     if(existing.data?.phone_number)return res.json({phone_number:existing.data.phone_number,provider_number_id:existing.data.provider_number_id,status:"active",message:"Your existing virtual number is ready."});
-    const areas=await fetch("https://fleexa.com.ng/developer/rent/sms4/areas",{headers:{Authorization:"Bearer "+apiKey,"Content-Type":"application/json"}});
-    const areasPayload=await areas.json();
-    if(!areas.ok)return res.status(areas.status).json({error:"Fleexa availability error.",details:areasPayload});
-    const areasList=Array.isArray(areasPayload?.data)?areasPayload.data:Array.isArray(areasPayload)?areasPayload:[];
-    const ng=areasList.find(x=>String(x.country||x.country_code||x.code||"").toUpperCase()==="NG"||String(x.name||x.countryName||"").toLowerCase().includes("nigeria")||String(x.area_code||"")==="NG");
-    if(!ng)return res.status(404).json({error:"Fleexa currently has no Nigerian long-term SMS rental listed for this API account.",details:areasPayload});
-    const purchase=await fetch("https://fleexa.com.ng/developer/rent/sms4/buy",{method:"POST",headers:{Authorization:"Bearer "+apiKey,"Content-Type":"application/json"},body:JSON.stringify({appName:"i mobile",time:"1",country:"NG"})});
+    const purchase=await fetch("https://fleexa.com.ng/developer/rent/sms4/buy",{method:"POST",headers:{Authorization:"Bearer "+apiKey,"Content-Type":"application/json"},body:JSON.stringify({appName:"i mobile",time:"1"})});
     const purchasePayload=await purchase.json();
     if(!purchase.ok)return res.status(purchase.status).json({error:"Fleexa number rental failed.",details:purchasePayload});
     const number=purchasePayload?.data;
