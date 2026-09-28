@@ -1,1 +1,0 @@
-<resources><style name="Theme.IMobile" parent="android:style/Theme.Material.NoActionBar"><item name="android:fontFamily">sans</item><item name="android:colorAccent">#FFFFFF</item><item name="android:statusBarColor">#0B0B0F</item><item name="android:navigationBarColor">#0B0B0F</item></style></resources>
