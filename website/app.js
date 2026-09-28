@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
       if(data?.error)throw new Error(data.error);
       const number=data?.phone_number;
       if(!number)throw new Error("No number was returned by the provider.");
-      document.querySelectorAll(".masked").forEach(el=>el.textContent=number);
+      document.querySelectorAll(".masked").forEach(el=>{el.textContent=number;el.style.wordBreak="break-all";el.style.letterSpacing="1px"});
       document.querySelectorAll(".dash-grid article").forEach(card=>{
         if(card.textContent.includes("MY VIRTUAL NUMBER")){
           const p=card.querySelector("p");if(p)p.textContent="Active • SMS enabled";
