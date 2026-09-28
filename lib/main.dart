@@ -1,47 +1,48 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  const url = String.fromEnvironment('SUPABASE_URL');
-  const key = String.fromEnvironment('SUPABASE_PUBLISHABLE_KEY');
-  if (url.isNotEmpty && key.isNotEmpty) {
-    await Supabase.initialize(url: url, publishableKey: key);
-  }
-  runApp(const ExamPilotApp());
-}
+const subjects=['Mathematics','English','Physics','Chemistry','Biology','Economics'];
+class Q{final String text;final List<String> options;final int answer;final String subject;final String explanation;const Q(this.text,this.options,this.answer,this.subject,this.explanation);}
+const questions=[
+Q('If 2x + 6 = 14, what is x?',['2','3','4','5'],2,'Mathematics','Subtract 6, then divide by 2.'),
+Q('What is the synonym of rapid?',['Slow','Quick','Weak','Late'],1,'English','Rapid means quick or fast.'),
+Q('Which quantity is measured in newtons?',['Mass','Force','Power','Energy'],1,'Physics','The newton is the SI unit of force.'),
+Q('What is the pH of a neutral solution at 25 degrees C?',['0','5','7','14'],2,'Chemistry','A neutral solution has pH 7.'),
+Q('Which organelle is the powerhouse of the cell?',['Nucleus','Ribosome','Mitochondrion','Golgi body'],2,'Biology','Mitochondria produce most cellular ATP.')];
+SupabaseClient? get supabase=>Supabase.instance.isInitialized?Supabase.instance.client:null;
 
-class ExamPilotApp extends StatelessWidget {
-  const ExamPilotApp({super.key});
-  @override
-  Widget build(BuildContext context) => MaterialApp(
-    debugShowCheckedModeBanner: false,
-    title: 'ExamPilot AI',
-    theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.indigo),
-    home: const HomePage(),
-  );
+Future<void> main()async{
+ WidgetsFlutterBinding.ensureInitialized();
+ const u=String.fromEnvironment('SUPABASE_URL'); const k=String.fromEnvironment('SUPABASE_PUBLISHABLE_KEY');
+ if(u.isNotEmpty&&k.isNotEmpty)await Supabase.initialize(url:u,publishableKey:k);
+ runApp(const ExamPilot());
 }
+class ExamPilot extends StatelessWidget{const ExamPilot({super.key});@override Widget build(BuildContext c)=>MaterialApp(debugShowCheckedModeBanner:false,title:'ExamPilot AI',theme:ThemeData(useMaterial3:true,colorSchemeSeed:Colors.indigo),home:const Home());}
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('ExamPilot AI')),
-    body: ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        Text('Prepare. Practice. Improve.', style: Theme.of(context).textTheme.headlineMedium),
-        const SizedBox(height: 8),
-        const Text('JAMB • WAEC • NECO • University Entrance'),
-        const SizedBox(height: 24),
-        _card(context, Icons.quiz_outlined, 'CBT Practice', 'Practice timed exam questions.'),
-        _card(context, Icons.auto_awesome, 'AI Tutor', 'Ask questions and get step-by-step explanations.'),
-        _card(context, Icons.insights, 'My Progress', 'Track scores and weak topics.'),
-        _card(context, Icons.bookmark_outline, 'Saved Questions', 'Keep questions for revision.'),
-      ],
-    ),
-  );
+class Home extends StatelessWidget{const Home({super.key});@override Widget build(BuildContext c)=>Scaffold(appBar:AppBar(title:const Text('ExamPilot AI'),actions:[IconButton(onPressed:()=>Navigator.push(c,MaterialPageRoute(builder:(_)=>const Account())),icon:const Icon(Icons.person))]),body:ListView(padding:const EdgeInsets.all(18),children:[
+Text('Prepare. Practice. Improve.',style:Theme.of(c).textTheme.headlineMedium?.copyWith(fontWeight:FontWeight.bold)),const SizedBox(height:8),const Text('JAMB • WAEC • NECO • University Entrance'),
+const SizedBox(height:20),Card(child:ListTile(leading:const CircleAvatar(child:Icon(Icons.school)),title:const Text('CBT Practice'),subtitle:const Text('Timed questions, scoring and explanations'),onTap:()=>Navigator.push(c,MaterialPageRoute(builder:(_)=>const Practice()))),
+Card(child:ListTile(leading:const CircleAvatar(child:Icon(Icons.auto_awesome)),title:const Text('AI Tutor'),subtitle:const Text('Ask questions and get step-by-step help'),onTap:()=>Navigator.push(c,MaterialPageRoute(builder:(_)=>const Tutor()))),
+Card(child:ListTile(leading:const CircleAvatar(child:Icon(Icons.insights)),title:const Text('Progress'),subtitle:const Text('Review subjects and improve'),onTap:()=>Navigator.push(c,MaterialPageRoute(builder:(_)=>const Progress()))),
+const SizedBox(height:15),const Text('Subjects',style:TextStyle(fontSize:20,fontWeight:FontWeight.bold)),Wrap(spacing:8,children:subjects.map((s)=>Chip(label:Text(s))).toList())]));}}
 
-  Widget _card(BuildContext c, IconData icon, String title, String subtitle) =>
-      Card(child: ListTile(leading: Icon(icon), title: Text(title), subtitle: Text(subtitle), trailing: const Icon(Icons.chevron_right)));
-}
+class Practice extends StatefulWidget{const Practice({super.key});@override State<Practice> createState()=>_PracticeState();}
+class _PracticeState extends State<Practice>{String subject='All';int count=5;@override Widget build(BuildContext c)=>Scaffold(appBar:AppBar(title:const Text('CBT Practice')),body:ListView(padding:const EdgeInsets.all(18),children:[
+DropdownButtonFormField<String>(initialValue:subject,decoration:const InputDecoration(labelText:'Subject',border:OutlineInputBorder()),items:['All',...subjects].map((s)=>DropdownMenuItem(value:s,child:Text(s))).toList(),onChanged:(v)=>setState(()=>subject=v!)),
+const SizedBox(height:15),DropdownButtonFormField<int>(initialValue:count,decoration:const InputDecoration(labelText:'Number of questions',border:OutlineInputBorder()),items:[5,10,20].map((n)=>DropdownMenuItem(value:n,child:Text(n.toString()))).toList(),onChanged:(v)=>setState(()=>count=v!)),
+const SizedBox(height:20),FilledButton.icon(onPressed:()=>Navigator.push(c,MaterialPageRoute(builder:(_)=>Quiz(subject:subject,count:count))),icon:const Icon(Icons.play_arrow),label:const Text('Start CBT'))]));}}
+
+class Quiz extends StatefulWidget{final String subject;final int count;const Quiz({super.key,required this.subject,required this.count});@override State<Quiz> createState()=>_QuizState();}
+class _QuizState extends State<Quiz>{late List<Q> qs;late List<int?> chosen;int pos=0,seconds=600;Timer? timer;
+@override void initState(){super.initState();qs=questions.where((q)=>widget.subject=='All'||q.subject==widget.subject).toList();if(qs.isEmpty)qs=questions;while(qs.length<widget.count)qs.addAll(questions);qs=qs.take(widget.count).toList();chosen=List<int?>.filled(qs.length,null);timer=Timer.periodic(const Duration(seconds:1),(_){if(seconds>0)setState(()=>seconds--);else finish();});}
+@override void dispose(){timer?.cancel();super.dispose();}
+void finish(){timer?.cancel();int score=0;for(var i=0;i<qs.length;i++){if(chosen[i]==qs[i].answer)score++;}Navigator.pushReplacement(context,MaterialPageRoute(builder:(_)=>Result(score:score,qs:qs,chosen:chosen)));}
+@override Widget build(BuildContext c){final q=qs[pos];return Scaffold(appBar:AppBar(title:Text('Question '+(pos+1).toString()+'/'+qs.length.toString()),actions:[Padding(padding:const EdgeInsets.all(14),child:Text((seconds~/60).toString()+':'+(seconds%60).toString().padLeft(2,'0')))]),body:ListView(padding:const EdgeInsets.all(18),children:[LinearProgressIndicator(value:(pos+1)/qs.length),const SizedBox(height:20),Text(q.subject,style:const TextStyle(fontWeight:FontWeight.bold)),const SizedBox(height:10),Text(q.text,style:Theme.of(c).textTheme.titleLarge),const SizedBox(height:18),...List.generate(q.options.length,(i)=>Card(color:chosen[pos]==i?Theme.of(c).colorScheme.primaryContainer:null,child:ListTile(onTap:()=>setState(()=>chosen[pos]=i),leading:CircleAvatar(child:Text(String.fromCharCode(65+i))),title:Text(q.options[i])))),const SizedBox(height:15),Row(children:[if(pos>0)Expanded(child:OutlinedButton(onPressed:()=>setState(()=>pos--),child:const Text('Previous'))),if(pos>0)const SizedBox(width:10),Expanded(child:FilledButton(onPressed:()=>pos==qs.length-1?finish():setState(()=>pos++),child:Text(pos==qs.length-1?'Submit':'Next')))])]);}}
+class Result extends StatelessWidget{final int score;final List<Q> qs;final List<int?> chosen;const Result({super.key,required this.score,required this.qs,required this.chosen});@override Widget build(BuildContext c)=>Scaffold(appBar:AppBar(title:const Text('Result')),body:ListView(padding:const EdgeInsets.all(18),children:[Card(child:Padding(padding:const EdgeInsets.all(22),child:Column(children:[Text(score.toString()+' / '+qs.length.toString(),style:Theme.of(c).textTheme.displaySmall),Text((score*100~/qs.length).toString()+'%'),const Text('Review your answers below.')] ))),...List.generate(qs.length,(i)=>ExpansionTile(title:Text('Question '+(i+1).toString()),subtitle:Text(chosen[i]==qs[i].answer?'Correct':'Review'),children:[ListTile(title:Text(qs[i].text)),ListTile(title:Text('Answer: '+qs[i].options[qs[i].answer])),ListTile(title:Text(qs[i].explanation))]))]));}}
+
+class Tutor extends StatefulWidget{const Tutor({super.key});@override State<Tutor> createState()=>_TutorState();}
+class _TutorState extends State<Tutor>{final ctl=TextEditingController();String answer='Ask an exam question. I will explain the solution step by step.';bool busy=false;Future<void> ask()async{if(ctl.text.trim().isEmpty)return;setState(()=>busy=true);try{if(supabase!=null){final r=await supabase!.functions.invoke('ai-tutor',body:{'question':ctl.text.trim()});answer=r.data is Map?(r.data['answer']??'No answer returned.').toString():r.data.toString();}else{answer='Connect the Supabase AI Tutor function and Groq secret to enable live AI answers.';}}catch(e){answer='AI Tutor is not connected yet. Check the Supabase Edge Function.';}if(mounted)setState(()=>busy=false);}
+@override Widget build(BuildContext c)=>Scaffold(appBar:AppBar(title:const Text('AI Tutor')),body:ListView(padding:const EdgeInsets.all(18),children:[Card(child:Padding(padding:const EdgeInsets.all(18),child:Text(answer))),const SizedBox(height:15),TextField(controller:ctl,maxLines:4,decoration:const InputDecoration(hintText:'Ask your question...',border:OutlineInputBorder())),const SizedBox(height:12),FilledButton.icon(onPressed:busy?null:ask,icon:const Icon(Icons.send),label:Text(busy?'Thinking...':'Ask AI'))]));}}
+class Progress extends StatelessWidget{const Progress({super.key});@override Widget build(BuildContext c)=>Scaffold(appBar:AppBar(title:const Text('My Progress')),body:ListView(padding:const EdgeInsets.all(18),children:[const Card(child:ListTile(title:Text('Practice history'),subtitle:Text('Your cloud history will appear here when Supabase Auth is enabled.'))),...subjects.map((s)=>Card(child:ListTile(title:Text(s),subtitle:const Text('Ready for practice'),trailing:const Icon(Icons.chevron_right))))]));}}
+class Account extends StatelessWidget{const Account({super.key});@override Widget build(BuildContext c){final u=supabase?.auth.currentUser;return Scaffold(appBar:AppBar(title:const Text('Account')),body:Padding(padding:const EdgeInsets.all(18),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text(u?.email??'Guest mode',style:Theme.of(c).textTheme.titleLarge),const SizedBox(height:12),if(u!=null)FilledButton(onPressed:()async{await supabase!.auth.signOut();if(c.mounted)Navigator.pop(c);},child:const Text('Sign out'))else const Text('Supabase Auth can be enabled for cloud accounts and progress.') ]));}}
