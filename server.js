@@ -24,6 +24,54 @@ async function evesesFetch(path,options={},base=EVESES_API_BASE){
   return payload;
 }
 
+app.post("/api/wallet/topup",async(req,res)=>{
+  try{
+    const auth=req.headers.authorization||"";
+    if(!auth.startsWith("Bearer "))return res.status(401).json({error:"Please sign in."});
+    const sb=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+    const {data:{user},error}=await sb.auth.getUser(auth.slice(7));
+    if(error||!user)return res.status(401).json({error:"Invalid session."});
+    const amount=Number(req.body?.amount);
+    if(!Number.isFinite(amount)||amount<500)return res.status(400).json({error:"Minimum wallet funding is ₦500."});
+    const secret=process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const paystack=process.env.PAYSTACK_SECRET_KEY;
+    if(!secret)return res.status(503).json({error:"Supabase service role key is not configured."});
+    if(!paystack)return res.status(503).json({error:"Payment gateway is not configured. Add PAYSTACK_SECRET_KEY on Render."});
+    const ref="IMW-"+Date.now()+"-"+Math.random().toString(36).slice(2,8).toUpperCase();
+    const admin=createClient(SUPABASE_URL,secret);
+    const {error:ins}=await admin.from("imobile_wallet_topups").insert({user_id:user.id,reference:ref,amount_ngn:amount,status:"pending",provider:"paystack"});
+    if(ins)throw Object.assign(new Error("Could not create wallet top-up."),{status:500,payload:ins.message});
+    const response=await fetch("https://api.paystack.co/transaction/initialize",{method:"POST",headers:{Authorization:"Bearer "+paystack,"Content-Type":"application/json"},body:JSON.stringify({email:user.email,amount:String(Math.round(amount*100)),currency:"NGN",reference:ref,callback_url:windowOrigin(req)+"/?wallet=success"})});
+    const payload=await response.json();
+    if(!response.ok||!payload.status)throw Object.assign(new Error(payload.message||"Payment initialization failed."),{status:502,payload});
+    res.json({authorization_url:payload.data.authorization_url,reference:ref});
+  }catch(e){res.status(e.status||500).json({error:e.message||"Wallet funding failed.",details:e.payload||null});}
+});
+function windowOrigin(req){const proto=(req.headers["x-forwarded-proto"]||"https").split(",")[0];return proto+"://"+req.get("host");}
+
+app.post("/api/paystack/webhook",async(req,res)=>{
+  try{
+    const crypto=await import("node:crypto");
+    const secret=process.env.PAYSTACK_SECRET_KEY;
+    const signature=req.headers["x-paystack-signature"];
+    if(!secret||!signature)return res.sendStatus(401);
+    const hash=crypto.createHmac("sha512",secret).update(JSON.stringify(req.body)).digest("hex");
+    if(hash!==signature)return res.sendStatus(401);
+    if(req.body?.event!=="charge.success")return res.sendStatus(200);
+    const d=req.body.data||{};
+    const ref=d.reference;
+    if(!ref)return res.sendStatus(200);
+    const admin=createClient(SUPABASE_URL,process.env.SUPABASE_SERVICE_ROLE_KEY);
+    const {data:topup}=await admin.from("imobile_wallet_topups").select("*").eq("reference",ref).maybeSingle();
+    if(!topup||topup.status==="successful")return res.sendStatus(200);
+    const paid=Number(d.amount)/100;
+    if(d.status!=="success"||d.currency!=="NGN"||paid!==Number(topup.amount_ngn))return res.sendStatus(200);
+    await admin.from("imobile_wallet_topups").update({status:"successful",provider_transaction_id:String(d.id),paid_at:new Date().toISOString()}).eq("id",topup.id);
+    await admin.from("imobile_wallet_ledger").insert({user_id:topup.user_id,amount_ngn:topup.amount_ngn,type:"credit",reason:"Wallet top-up",reference:ref});
+    res.sendStatus(200);
+  }catch(e){res.sendStatus(500);}
+});
+
 app.get("/api/wallet",async(req,res)=>{
   try{
     if(!process.env.EVESES_API_KEY)return res.status(503).json({error:"Eveses is not configured on Render."});
