@@ -18,8 +18,8 @@ jobs:
         with:
           channel: stable
           cache: true
-      - name: Create Android project
-        run: flutter create . --platforms=android --project-name exampilot_ai
+      - name: Create Flutter Android and Web platforms
+        run: flutter create . --platforms=android,web --project-name exampilot_ai
       - run: flutter pub get
       - run: flutter analyze
       - name: Build APK
