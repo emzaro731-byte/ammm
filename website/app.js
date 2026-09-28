@@ -61,7 +61,12 @@ document.addEventListener("DOMContentLoaded",async()=>{
     if(btn)btn.disabled=true;
     actionMessage("Number request","Requesting your +234 virtual number…");
     try{
-      const {data,error}=await supabase.functions.invoke("provision-number");
+      const {data:sessionData}=await supabase.auth.getSession();
+      const accessToken=sessionData?.session?.access_token;
+      if(!accessToken)throw new Error("Please sign in again.");
+      const response=await fetch("/api/provision-number",{method:"POST",headers:{Authorization:"Bearer "+accessToken,"Content-Type":"application/json"}});
+      const data=await response.json();
+      const error=response.ok?null:new Error(data?.error||"Number service failed.");
       if(error)throw error;
       if(data?.error)throw new Error(data.error);
       const number=data?.phone_number;
