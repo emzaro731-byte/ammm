@@ -35,5 +35,5 @@ app.post("/api/provision-number",async(req,res)=>{
     res.json({phone_number:phone,provider_number_id:providerId,status:"active",message:"Your +234 virtual number is ready."});
   }catch(e){res.status(500).json({error:e instanceof Error?e.message:"Unexpected error"});}
 });
-app.get("*",(req,res)=>res.sendFile("index.html",{root:"website"}));
+app.use((req,res)=>res.sendFile("index.html",{root:"website"}));
 app.listen(PORT,()=>console.log("i mobile server listening on "+PORT));
