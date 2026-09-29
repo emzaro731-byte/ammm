@@ -142,7 +142,7 @@ class _ChatPageState extends State<ChatPage> {
               onChanged: (v) => setState(() => provider = v ?? 'Veylola'),
             ),
           ]),
-        },
+        ),
         Expanded(
           child: ListView.builder(
             controller: scroll,
