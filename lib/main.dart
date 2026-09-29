@@ -47,6 +47,7 @@ class _ChatPageState extends State<ChatPage> {
     Message('Hello. I’m Veylola AI. How can I help you today?', false),
   ];
   bool loading = false;
+  String provider = 'Veylola';
 
   Future<void> send() async {
     final text = controller.text.trim();
@@ -61,7 +62,7 @@ class _ChatPageState extends State<ChatPage> {
       final response = await http.post(
         Uri.parse('$apiBase/chat'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'message': text}),
+        body: jsonEncode({'message': text, 'provider': provider.toLowerCase()}),
       );
       final data = jsonDecode(response.body);
       final answer = (data['response'] ?? data['text'] ?? data['message'] ??
@@ -129,6 +130,19 @@ class _ChatPageState extends State<ChatPage> {
         ]),
       ),
       body: Column(children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 10, 14, 0),
+          child: Row(children: [
+            const Text('AI mode', style: TextStyle(color: Colors.white60)),
+            const SizedBox(width: 10),
+            DropdownButton<String>(
+              value: provider,
+              dropdownColor: const Color(0xFF101B32),
+              items: const ['Veylola', 'Groq', 'Grok'].map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
+              onChanged: (v) => setState(() => provider = v ?? 'Veylola'),
+            ),
+          ]),
+        },
         Expanded(
           child: ListView.builder(
             controller: scroll,
