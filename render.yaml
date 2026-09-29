@@ -1,7 +1,21 @@
 services:
   - type: web
-    name: betnova-web
-    env: docker
+    name: veylola-ai
+    runtime: node
     plan: free
-    dockerfilePath: ./Dockerfile
-    autoDeploy: true
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: XAI_API_KEY
+        sync: false
+      - key: AI_MODEL
+        value: gpt-4o-mini
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-120b
+      - key: GROK_MODEL
+        value: grok-4.1-fast
