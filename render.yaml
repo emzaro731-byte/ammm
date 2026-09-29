@@ -1,11 +1,7 @@
 services:
   - type: web
-    name: exampilot-ai
-    runtime: docker
+    name: betnova-web
+    env: docker
     plan: free
+    dockerfilePath: ./Dockerfile
     autoDeploy: true
-    envVars:
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_PUBLISHABLE_KEY
-        sync: false

@@ -1,5 +1,5 @@
-name: exampilot_ai
-description: Nigeria-focused exam practice and AI tutor
+name: betnova
+description: BetNova betting platform - compliance-gated Flutter app
 publish_to: "none"
 version: 1.0.0+1
 environment:
@@ -7,7 +7,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  supabase_flutter: ^2.10.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
