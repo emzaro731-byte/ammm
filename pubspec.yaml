@@ -1,5 +1,5 @@
-name: betnova
-description: BetNova betting platform - compliance-gated Flutter app
+name: veylola_ai
+description: Veylola AI - a Flutter AI assistant.
 publish_to: "none"
 version: 1.0.0+1
 environment:
@@ -7,9 +7,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  http: ^1.2.2
+  shared_preferences: ^2.3.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^4.0.0
 flutter:
   uses-material-design: true

@@ -1,4 +1,15 @@
-# BetNova
-Fresh Flutter betting-platform frontend for Android and Render web.
-GitHub Actions generates the Android project and publishes a release APK artifact. Render builds and serves Flutter Web.
-Cash deposits, withdrawals and real-money wagering are intentionally locked in this development build until the required licensing, KYC/AML, payment, odds, settlement, audit and responsible-gambling systems are configured.
+# Veylola AI
+
+A Flutter mobile AI assistant connected to the Veylola API.
+
+## Run
+flutter pub get
+flutter run
+
+## Build APK
+flutter build apk --release
+
+## API
+The default API is `https://api-gctb.onrender.com`.
+Override it with:
+flutter run --dart-define=VEYLOLA_API_URL=https://your-api.example.com

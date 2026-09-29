@@ -1,41 +1,202 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-void main() => runApp(const BetNovaApp());
-class BetNovaApp extends StatelessWidget {
-  const BetNovaApp({super.key});
-  @override Widget build(BuildContext context) => MaterialApp(title:'BetNova',debugShowCheckedModeBanner:false,
-    theme:ThemeData(brightness:Brightness.dark,scaffoldBackgroundColor:const Color(0xFF07110D),colorScheme:ColorScheme.fromSeed(seedColor:const Color(0xFF19D47B),brightness:Brightness.dark),useMaterial3:true),
-    home:const LoginPage());
-}
-class LoginPage extends StatefulWidget{const LoginPage({super.key});@override State<LoginPage> createState()=>_LoginPageState();}
-class _LoginPageState extends State<LoginPage>{
- bool signUp=false; final email=TextEditingController(),password=TextEditingController();
- @override Widget build(BuildContext c)=>Scaffold(body:SafeArea(child:Center(child:SingleChildScrollView(padding:const EdgeInsets.all(24),child:ConstrainedBox(constraints:const BoxConstraints(maxWidth:460),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
- const SizedBox(height:30),const Text('BETNOVA',style:TextStyle(fontSize:34,fontWeight:FontWeight.w900,letterSpacing:2)),const SizedBox(height:8),
- Text(signUp?'Create your account':'Welcome back',style:const TextStyle(fontSize:22,fontWeight:FontWeight.bold)),const SizedBox(height:28),
- TextField(controller:email,decoration:const InputDecoration(labelText:'Email',prefixIcon:Icon(Icons.email_outlined))),const SizedBox(height:14),
- TextField(controller:password,obscureText:true,decoration:const InputDecoration(labelText:'Password',prefixIcon:Icon(Icons.lock_outline))),
- if(signUp)const Padding(padding:EdgeInsets.only(top:14),child:Text('You must meet the legal age and identity requirements applicable to your jurisdiction.',style:TextStyle(color:Colors.white60))),
- const SizedBox(height:22),SizedBox(width:double.infinity,height:54,child:FilledButton(onPressed:()=>Navigator.pushReplacement(c,MaterialPageRoute(builder:(_)=>const HomePage())),child:Text(signUp?'Create account':'Sign in'))),
- Center(child:TextButton(onPressed:()=>setState(()=>signUp=!signUp),child:Text(signUp?'Already have an account? Sign in':'Create an account'))),const SizedBox(height:12),const ComplianceBanner()
-]))))));
-}
-}
-class ComplianceBanner extends StatelessWidget{const ComplianceBanner({super.key});@override Widget build(BuildContext c)=>Container(padding:const EdgeInsets.all(14),decoration:BoxDecoration(color:Colors.white10,borderRadius:BorderRadius.circular(16),border:Border.all(color:Colors.white12)),child:const Row(crossAxisAlignment:CrossAxisAlignment.start,children:[Icon(Icons.verified_user_outlined,color:Color(0xFF19D47B)),SizedBox(width:10),Expanded(child:Text('Cash wagering is compliance-gated. Deposits, withdrawals and real-money bets remain disabled until the required approvals, KYC and payment controls are configured.'))]));}
-class HomePage extends StatefulWidget{const HomePage({super.key});@override State<HomePage> createState()=>_HomePageState();}
-class _HomePageState extends State<HomePage>{
- int tab=0; final events=const[['Premier League','Liverpool vs Arsenal','Today • 20:00'],['LaLiga','Barcelona vs Sevilla','Tomorrow • 18:30'],['NBA','Lakers vs Warriors','Tomorrow • 02:00'],['Champions League','Inter vs Bayern','Wed • 20:00']];
- @override Widget build(BuildContext c){final pages=[HomeTab(events:events),const BetsTab(),const WalletTab(),const ProfileTab()];return Scaffold(appBar:AppBar(title:const Text('BETNOVA',style:TextStyle(fontWeight:FontWeight.w900,letterSpacing:1.5))),body:pages[tab],bottomNavigationBar:NavigationBar(selectedIndex:tab,onDestinationSelected:(i)=>setState(()=>tab=i),destinations:const[NavigationDestination(icon:Icon(Icons.home_outlined),selectedIcon:Icon(Icons.home),label:'Home'),NavigationDestination(icon:Icon(Icons.receipt_long_outlined),selectedIcon:Icon(Icons.receipt_long),label:'Bets'),NavigationDestination(icon:Icon(Icons.account_balance_wallet_outlined),selectedIcon:Icon(Icons.account_balance_wallet),label:'Wallet'),NavigationDestination(icon:Icon(Icons.person_outline),selectedIcon:Icon(Icons.person),label:'Profile')]));}
-}
-class HomeTab extends StatelessWidget{final List<List<String>> events;const HomeTab({super.key,required this.events});@override Widget build(BuildContext c)=>ListView(padding:const EdgeInsets.all(16),children:[
- Container(padding:const EdgeInsets.all(20),decoration:BoxDecoration(borderRadius:BorderRadius.circular(24),gradient:const LinearGradient(colors:[Color(0xFF123F2B),Color(0xFF0B2118)])),child:const Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text('SPORTS BETTING',style:TextStyle(color:Color(0xFF19D47B),fontWeight:FontWeight.bold)),SizedBox(height:8),Text('Your matches.\nYour picks.',style:TextStyle(fontSize:28,fontWeight:FontWeight.w900)),SizedBox(height:8),Text('Explore markets and build your bet slip.')]))),
- const SizedBox(height:22),const Text('Popular sports',style:TextStyle(fontSize:20,fontWeight:FontWeight.bold)),const SizedBox(height:12),const Row(children:[Expanded(child:_Chip('⚽ Football')),SizedBox(width:8),Expanded(child:_Chip('🏀 Basketball')),SizedBox(width:8),Expanded(child:_Chip('🎾 Tennis'))]),
- const SizedBox(height:24),const Text('Upcoming events',style:TextStyle(fontSize:20,fontWeight:FontWeight.bold)),const SizedBox(height:10),...events.map((e)=>_Event(e))
-]);}
-}
-class _Chip extends StatelessWidget{final String t;const _Chip(this.t);@override Widget build(BuildContext c)=>Container(padding:const EdgeInsets.symmetric(vertical:14),decoration:BoxDecoration(color:Colors.white10,borderRadius:BorderRadius.circular(14)),child:Center(child:Text(t,style:const TextStyle(fontWeight:FontWeight.bold))));}
-class _Event extends StatelessWidget{final List<String> e;const _Event(this.e);@override Widget build(BuildContext c)=>Card(margin:const EdgeInsets.only(bottom:10),child:Padding(padding:const EdgeInsets.all(14),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Row(mainAxisAlignment:MainAxisAlignment.spaceBetween,children:[Text(e[0],style:const TextStyle(color:Colors.white60)),Text(e[2],style:const TextStyle(color:Color(0xFF19D47B)))]),const SizedBox(height:8),Text(e[1],style:const TextStyle(fontSize:17,fontWeight:FontWeight.bold)),const SizedBox(height:12),const Row(children:[Expanded(child:_Odd('Home','2.10')),Expanded(child:_Odd('Draw','3.30')),Expanded(child:_Odd('Away','3.05'))])])));}
-class _Odd extends StatelessWidget{final String l,v;const _Odd(this.l,this.v);@override Widget build(BuildContext c)=>Container(margin:const EdgeInsets.only(right:6),padding:const EdgeInsets.symmetric(vertical:10),decoration:BoxDecoration(color:Colors.white10,borderRadius:BorderRadius.circular(10)),child:Column(children:[Text(l,style:const TextStyle(fontSize:12,color:Colors.white60)),Text(v,style:const TextStyle(fontWeight:FontWeight.bold))]));}
-class BetsTab extends StatelessWidget{const BetsTab({super.key});@override Widget build(BuildContext c)=>const Center(child:Text('No bets yet'));}
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-class WalletTab extends StatelessWidget{const WalletTab({super.key});@override Widget build(BuildContext c)=>ListView(padding:const EdgeInsets.all(16),children:[const Text('Wallet',style:TextStyle(fontSize:26,fontWeight:FontWeight.w900)),const SizedBox(height:16),Container(padding:const EdgeInsets.all(22),decoration:BoxDecoration(borderRadius:BorderRadius.all(Radius.circular(22)),color:Color(0xFF103524)),child:const Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text('Available balance',style:TextStyle(color:Colors.white60)),SizedBox(height:8),Text('₦0.00',style:TextStyle(fontSize:34,fontWeight:FontWeight.w900))])),const SizedBox(height:18),Row(children:[Expanded(child:FilledButton.icon(onPressed:()=>_locked(c),icon:const Icon(Icons.add),label:const Text('Deposit'))),const SizedBox(width:10),Expanded(child:OutlinedButton.icon(onPressed:()=>_locked(c),icon:const Icon(Icons.arrow_upward),label:const Text('Withdraw')))]),const SizedBox(height:22),const Text('Transactions',style:TextStyle(fontSize:19,fontWeight:FontWeight.bold)),const SizedBox(height:10),const Text('No transactions yet.',style:TextStyle(color:Colors.white60))]);void _locked(BuildContext c)=>showDialog(context:c,builder:(_)=>AlertDialog(title:const Text('Cash wallet locked'),content:const Text('Payment processing is disabled in this development build. Production activation requires licensing, KYC/AML, an approved payment provider and reconciliation.'),actions:[TextButton(onPressed:()=>Navigator.pop(c),child:const Text('OK'))]));}
-class ProfileTab extends StatelessWidget{const ProfileTab({super.key});@override Widget build(BuildContext c)=>const ListView(padding:EdgeInsets.all(16),children:[CircleAvatar(radius:42,child:Icon(Icons.person,size:44)),SizedBox(height:12),Center(child:Text('Guest account',style:TextStyle(fontSize:20,fontWeight:FontWeight.bold))),SizedBox(height:24),ListTile(leading:Icon(Icons.verified_user_outlined,color:Color(0xFF19D47B)),title:Text('KYC verification'),subtitle:Text('Required before cash features')),ListTile(leading:Icon(Icons.shield_outlined,color:Color(0xFF19D47B)),title:Text('Responsible gaming'),subtitle:Text('Limits and self-exclusion')),ListTile(leading:Icon(Icons.help_outline,color:Color(0xFF19D47B)),title:Text('Help & support'),subtitle:Text('Contact support'))]);}
+void main() => runApp(const VeylolaApp());
+
+class VeylolaApp extends StatelessWidget {
+  const VeylolaApp({super.key});
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+    debugShowCheckedModeBanner: false,
+    title: 'Veylola AI',
+    theme: ThemeData(
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: const Color(0xFF050B18),
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color(0xFF4D7CFE),
+        brightness: Brightness.dark,
+      ),
+      useMaterial3: true,
+    ),
+    home: const ChatPage(),
+  );
+}
+
+class Message {
+  final String text;
+  final bool user;
+  Message(this.text, this.user);
+}
+
+class ChatPage extends StatefulWidget {
+  const ChatPage({super.key});
+  @override
+  State<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> {
+  static const apiBase = String.fromEnvironment(
+    'VEYLOLA_API_URL',
+    defaultValue: 'https://api-gctb.onrender.com',
+  );
+  final controller = TextEditingController();
+  final scroll = ScrollController();
+  final messages = <Message>[
+    Message('Hello. I’m Veylola AI. How can I help you today?', false),
+  ];
+  bool loading = false;
+
+  Future<void> send() async {
+    final text = controller.text.trim();
+    if (text.isEmpty || loading) return;
+    setState(() {
+      messages.add(Message(text, true));
+      controller.clear();
+      loading = true;
+    });
+    _scrollDown();
+    try {
+      final response = await http.post(
+        Uri.parse('$apiBase/chat'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'message': text}),
+      );
+      final data = jsonDecode(response.body);
+      final answer = (data['response'] ?? data['text'] ?? data['message'] ??
+              'I could not generate a response.')
+          .toString();
+      if (!mounted) return;
+      setState(() => messages.add(Message(answer, false)));
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => messages.add(
+        Message('Connection error. Check your API server and try again.', false),
+      ));
+    } finally {
+      if (mounted) {
+        setState(() => loading = false);
+        _scrollDown();
+      }
+    }
+  }
+
+  void _scrollDown() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (scroll.hasClients) {
+        scroll.animateTo(
+          scroll.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    scroll.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF071126),
+        titleSpacing: 18,
+        title: Row(children: [
+          Container(
+            width: 38, height: 38,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              gradient: const LinearGradient(
+                colors: [Color(0xFF4D7CFE), Color(0xFF8B5CF6)],
+              ),
+            ),
+            child: const Icon(Icons.auto_awesome, color: Colors.white),
+          ),
+          const SizedBox(width: 12),
+          const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Veylola AI', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text('AI assistant', style: TextStyle(fontSize: 11, color: Colors.white54)),
+            ],
+          ),
+        ]),
+      ),
+      body: Column(children: [
+        Expanded(
+          child: ListView.builder(
+            controller: scroll,
+            padding: const EdgeInsets.fromLTRB(14, 18, 14, 12),
+            itemCount: messages.length + (loading ? 1 : 0),
+            itemBuilder: (_, i) {
+              if (loading && i == messages.length) {
+                return const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Veylola is thinking…', style: TextStyle(color: Colors.white54)),
+                  ),
+                );
+              }
+              final m = messages[i];
+              return Align(
+                alignment: m.user ? Alignment.centerRight : Alignment.centerLeft,
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 340),
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: m.user ? const Color(0xFF315FEA) : const Color(0xFF101B32),
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Text(m.text, style: const TextStyle(fontSize: 15, height: 1.4)),
+                ),
+              );
+            },
+          ),
+        ),
+        SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 6, 10, 10),
+            child: Row(children: [
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  minLines: 1,
+                  maxLines: 5,
+                  textInputAction: TextInputAction.newline,
+                  onSubmitted: (_) => send(),
+                  decoration: InputDecoration(
+                    hintText: 'Message Veylola…',
+                    filled: true,
+                    fillColor: const Color(0xFF101B32),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton.filled(
+                onPressed: loading ? null : send,
+                icon: const Icon(Icons.arrow_upward),
+                style: IconButton.styleFrom(
+                  backgroundColor: const Color(0xFF4D7CFE),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.all(14),
+                ),
+              ),
+            ]),
+          ),
+        ),
+      ]),
+    );
+  }
+}
