@@ -7,15 +7,15 @@ services:
     buildCommand: npm install
     startCommand: npm start
     envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DB_PATH
+        value: /var/data/veylola.db
       - key: OPENAI_API_KEY
         sync: false
       - key: GROQ_API_KEY
         sync: false
       - key: XAI_API_KEY
-        sync: false
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_ANON_KEY
         sync: false
       - key: AI_MODEL
         value: gpt-4o-mini
@@ -23,3 +23,7 @@ services:
         value: openai/gpt-oss-120b
       - key: GROK_MODEL
         value: grok-4.1-fast
+    disk:
+      name: veylola-data
+      mountPath: /var/data
+      sizeGB: 1
