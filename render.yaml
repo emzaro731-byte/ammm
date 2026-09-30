@@ -23,7 +23,3 @@ services:
         value: openai/gpt-oss-120b
       - key: GROK_MODEL
         value: grok-4.1-fast
-    disk:
-      name: veylola-data
-      mountPath: /var/data
-      sizeGB: 1
