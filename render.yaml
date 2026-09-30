@@ -10,7 +10,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: DB_PATH
-        value: /var/data/veylola.db
+        value: ./veylola.db
       - key: OPENAI_API_KEY
         sync: false
       - key: GROQ_API_KEY
