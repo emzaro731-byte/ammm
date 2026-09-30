@@ -48,11 +48,26 @@ function auth(req,res,next){
   req.user=jwt.verify(t,JWT_SECRET); next();
  }catch{res.status(401).json({error:"Authentication required"});}
 }
-async function call(p,m){
- const cfg=p==="groq"?["https://api.groq.com/openai/v1/chat/completions",keys.groq,process.env.GROQ_MODEL||"openai/gpt-oss-120b"]:p==="grok"?["https://api.x.ai/v1/chat/completions",keys.grok,process.env.GROK_MODEL||"grok-4.1-fast"]:["https://api.openai.com/v1/chat/completions",keys.openai,process.env.AI_MODEL||"gpt-4o-mini"];
- if(!cfg[1])throw Error(p.toUpperCase()+" API key is not configured");
- const r=await fetch(cfg[0],{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+cfg[1]},body:JSON.stringify({model:cfg[2],messages:[{role:"system",content:"You are Veylola AI, a helpful, accurate and safe AI assistant."},{role:"user",content:m}]})});
- const d=await r.json(); if(!r.ok)throw Error(d?.error?.message||"Provider error");
+async function call(p,messages){
+ const cfg=p==="groq"
+  ? ["https://api.groq.com/openai/v1/chat/completions",keys.groq,process.env.GROQ_MODEL||"openai/gpt-oss-120b"]
+  : p==="grok"
+  ? ["https://api.x.ai/v1/chat/completions",keys.grok,process.env.GROK_MODEL||"grok-4.1-fast"]
+  : ["https://api.openai.com/v1/chat/completions",keys.openai,process.env.AI_MODEL||"gpt-5.6-luna"];
+ if(!cfg[1]) throw Error(p.toUpperCase()+" API key is not configured");
+ const r=await fetch(cfg[0],{
+  method:"POST",
+  headers:{"Content-Type":"application/json",Authorization:"Bearer "+cfg[1]},
+  body:JSON.stringify({
+   model:cfg[2],
+   messages:[
+    {role:"system",content:"You are Veylola AI, an original AI assistant. Be helpful, accurate, clear, safe, and honest about uncertainty. Maintain context across the conversation. Never claim to be ChatGPT or OpenAI."},
+    ...messages
+   ]
+  })
+ });
+ const d=await r.json();
+ if(!r.ok) throw Error(d?.error?.message||"AI provider error");
  return d.choices?.[0]?.message?.content||"No response generated.";
 }
 
@@ -88,9 +103,12 @@ app.post("/chat",auth,async(req,res)=>{
   const m=String(req.body?.message||"").trim(); if(!m)return res.status(400).json({error:"message is required"});
   let p=String(req.body?.provider||"veylola").toLowerCase(); if(p==="veylola")p="openai";
   let cid=Number(req.body?.conversation_id);
-  if(!cid){const x=db.prepare("INSERT INTO conversations(user_id) VALUES(?)").run(req.user.id);cid=Number(x.lastInsertRowid);}
+  if(!cid){const x=db.prepare("INSERT INTO conversations(user_id,title) VALUES(?,?)").run(req.user.id,m.slice(0,60)||"New chat");cid=Number(x.lastInsertRowid);}
+  const owner=db.prepare("SELECT id FROM conversations WHERE id=? AND user_id=?").get(cid,req.user.id);
+  if(!owner)return res.status(404).json({error:"Conversation not found"});
   db.prepare("INSERT INTO messages(conversation_id,role,content) VALUES(?,?,?)").run(cid,"user",m);
-  const answer=await call(p,m);
+  const history=db.prepare("SELECT role,content FROM messages WHERE conversation_id=? ORDER BY id DESC LIMIT 40").all(cid).reverse();
+  const answer=await call(p,history);
   db.prepare("INSERT INTO messages(conversation_id,role,content) VALUES(?,?,?)").run(cid,"assistant",answer);
   res.json({response:answer,provider:p,conversation_id:cid});
  }catch(e){res.status(500).json({error:e.message});}
